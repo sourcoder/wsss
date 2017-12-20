@@ -128,4 +128,12 @@ class Summary extends \yii\db\ActiveRecord
         ->all();
         return $data[0]['Tid'];
     }
+    
+    public function getZidsByTid($Tid) {
+        $data = $this->find()
+        ->where(['Tid' => $Tid])
+        ->asArray()
+        ->all();
+        return $data;
+    }
 }

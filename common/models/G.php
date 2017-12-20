@@ -30,6 +30,7 @@ class G extends \yii\db\ActiveRecord
         return [
             [['Tid', 'Zid', 'GScore'], 'required'],
             [['Tid', 'Zid', 'GScore',], 'integer'],
+            [['GScore'], 'integer', 'max'=>100, 'min'=>0],
             [['Gsuggestion'], 'string'],
         ];
     }
@@ -57,5 +58,21 @@ class G extends \yii\db\ActiveRecord
         }else{
             return false;
         }
+    }
+    
+    public function getAllGByZid($Zid) {
+        $data = $this->find()
+                ->where(['Zid' => $Zid])
+                ->asArray()
+                ->all();
+        return $data;
+    }
+    
+    public function getZidsByTid($Tid) {
+        $data = $this->find()
+        ->where(['Tid' => $Tid])
+        ->asArray()
+        ->all();
+        return $data;
     }
 }

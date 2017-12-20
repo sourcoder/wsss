@@ -9,11 +9,12 @@ use yii\bootstrap\Html;
     <table>
         <tr><td><?= $data['Tname']?></td><tr>
         <tr><td><img src="<?= '/'.$data['Tphoto'] ?>"/></td></tr>
+        <tr><td><a href="<?='/'.$summaryinfo['Zpathurl']?>">点击下载个人工作总结</a></td></tr>
         <?php $form = ActiveForm::begin([
 				
 			]) ?>
         <tr><td><?= $form->field($g, 'GScore')->textInput() ?></td></tr>
-		<?php if($Tid) {?>
+		<?php if($isAdvicer) {?>
 		  <tr><td><?= $form->field($g, 'Gsuggestion')->textarea(['rows'=>3]) ?></td></tr> 
         <?php }?>
 		  <tr><td><?= Html::submitButton("提交", ['class' => 'btn btn-info btn-flat margin upload-btn'])?></td></tr>

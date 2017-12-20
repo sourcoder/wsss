@@ -1,7 +1,7 @@
 <?php
 
 namespace backend\controllers;
-
+use yii\filters\AccessControl;
 use Yii;
 use backend\models\Teacher;
 use backend\models\TeacherSearch;
@@ -26,9 +26,22 @@ class TeacherController extends Controller
                     'delete' => ['POST'],
                 ],
             ],
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'actions' => ['login', 'error'],
+                        'allow' => true,
+                    ],
+                    [
+                        'actions' => ['logout', 'index', 'view', 'update', 'create', 'delete'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
         ];
     }
-
     /**
      * Lists all Teacher models.
      * @return mixed

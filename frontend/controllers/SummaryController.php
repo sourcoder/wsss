@@ -8,6 +8,8 @@ use yii\web\UploadedFile;
 use common\models\Summary;
 use common\models\Teacher;
 use common\models\G;
+use phpDocumentor\Reflection\Types\Boolean;
+use yii\base\BaseObject;
 class SummaryController extends \yii\web\Controller
 {
     public function actionIndex()
@@ -69,9 +71,34 @@ class SummaryController extends \yii\web\Controller
     public function actionAssess($tid){
         
         $data = $this->getSummaryList($tid);
+        $g = new G();
+        $zids = $g->getZidsByTid($tid);
+        if($zids) {
+            $flag = 0;
+            for ($i=0; $i < count($data); $i++) {
+                foreach ($zids as $zid) {
+                    if($zid['Zid'] == $data[$i]['summary']['Zid']) {
+                        $flag = 1;
+                        break;
+                    }
+                }
+                if($flag) {
+                    $data[$i]['isScore'] = true;
+                }else {
+                    $data[$i]['isScore'] = false;
+                }
+                $flag = 0;
+            }
+        }else {
+            for ($i=0; $i < count($data); $i++) {
+                $data[$i]['isScore'] = false;
+            }
+        }
+        
         return $this->render('assess',
             [
                 'data'=>$data,
+                'tid'=>$tid,
             ]);
     }
     /**
@@ -83,21 +110,29 @@ class SummaryController extends \yii\web\Controller
         //得到所有的机关老师的数据
         $teachers = $teacher->getAllTeacher();
         $ids = [];
-        foreach ($teachers as $teacher) {
-            $ids[] = $teacher['Tid'];
+        $los = 0;
+        for ($i=0; $i < count($teachers); $i++) {
+            if($teachers[$i]['Tid'] != $tid)
+                $ids[] = $teachers[$i]['Tid'];
+            else
+                $los = $i;
         }
         $summaryModel = new Summary();
-        $teacher = new Teacher();
         $summarys = [];
         $names = [];    //得到所有被评价机关老师的名称
-        if(count($teacher) <= 10) {
+        if(count($teachers) <= 11) {
             $summarys = $summaryModel->getAllLastestSummary($ids);
             $names = $teacher->getNamesByTids($ids);
+            //$names = delByValue
         }else {
-            
-            for($i=0; $i < 10; $i++) {
-                $summarys[] = $summaryModel->getLastestSummaryByTid(($tid+i+1) % count($teachers));
-                $names[] = $teacher->getNameByTid(($tid+i+1) % count($teachers));
+            if($teacher->isAdvicer($tid)) {
+                $summarys = $summaryModel->getAllLastestSummary($ids);
+                $names = $teacher->getNamesByTids($ids);
+            }else {
+                for($i=0; $i < 10; $i++) {
+                    $summarys[] = $summaryModel->getLastestSummaryByTid( $ids[$los+1+i% count($teachers)]);
+                    $names[] = $teacher->getNameByTid($ids[$los+1+i% count($teachers)]);
+                }
             }
         }
         for($i=0; $i < count($names); $i++) {
@@ -106,7 +141,18 @@ class SummaryController extends \yii\web\Controller
         }
         return $data;
     }
-
+    
+    function delByValue($arr, $value){
+        if(!is_array($arr)){
+            return $arr;
+        }
+        foreach($arr as $k=>$v){
+            if($v == $value){
+                unset($arr[$k]);
+            }
+        }
+        return $arr;
+    }
     /**
      * 评委或机关老师评分
      * @param unknown $Tid 评委或评分机关老师的id
@@ -116,8 +162,9 @@ class SummaryController extends \yii\web\Controller
         
         $teacher = new Teacher();
         $summary = new Summary();
-        $teacherid = $summary->getTidByZid($Zid);
-        $teacherinfo = $teacher->getTeacherInfoByTid($teacherid);
+        $summaryinfo = $summary->getLastestSummaryByTid($Zid);
+        $teacherinfo = $teacher->getTeacherInfoByTid($summaryinfo['Tid']);
+        $isAdvicer = $teacher->isAdvicer($Tid);
         $g = new G();
         $data['Tid'] = $Tid;
         $data['Zid'] = $Zid;
@@ -128,6 +175,7 @@ class SummaryController extends \yii\web\Controller
             $data['Gsuggestion'] = array_key_exists('Gsuggestion', $post['G']) ? $post['G']['Gsuggestion']:null;
             if($g->saveData($data)) {
                 echo "<script>alert('评分成功')</script>";
+                $this->redirect(['/summary/assess', 'tid'=> $Tid]);
             }else {
                 echo "<script>alert('评分失败')</script>";
             }
@@ -137,6 +185,8 @@ class SummaryController extends \yii\web\Controller
                 'data'=>$teacherinfo,
                 'g'=>$g,
                 'Tid'=>$Tid,
+                'isAdvicer'=>$isAdvicer,
+                'summaryinfo'=>$summaryinfo,
             ]);
     }
 }

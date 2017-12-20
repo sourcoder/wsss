@@ -115,4 +115,12 @@ class Teacher extends \yii\db\ActiveRecord
         ->all();
         return $data[0];
     }
+    
+    public function isAdvicer($Tid) {
+        $data = $this->find()
+        ->where(['Tid' => $Tid])
+        ->asArray()
+        ->all();
+        return $data[0]['Ttype'] == 1 ? true:false;
+    }
 }
