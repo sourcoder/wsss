@@ -16,7 +16,7 @@ use yii\widgets\ActiveForm;
 
     <?= $form->field($model, 'Taccount')->textInput(['maxlength' => true]) ?>
 
-    <?= $form->field($model, 'Tpassword')->textInput(['maxlength' => true]) ?>
+    <?= $form->field($model, 'Tpassword')->textInput(['maxlength' => true, 'value'=>'123456']) ?>
 
     <?= $form->field($model, 'Ttype')->dropDownList([1 => '评委', 0=> '机关老师']);?>
 

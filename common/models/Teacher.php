@@ -67,11 +67,52 @@ class Teacher extends \yii\db\ActiveRecord
         ];
     }
     
+    /**
+     * 通过id得到对应的名字
+     * @param unknown $Tid
+     */
     public function getNameByTid($Tid) {
         $data = $this->find()
         ->where(['Tid' => $Tid])
         ->asArray()
         ->all();;
         return $data[0]['Tname'];
+    }
+    /**
+     * 得到所有的机关老师
+     */
+    public function getAllTeacher(){
+        $data = $this->find()
+        ->where(['Ttype' => 0])
+        ->asArray()
+        ->all();
+        return $data;
+    }
+    /**
+     * 通过Tid得到得到老师的名字，注意：输入输出都是数组
+     * @param unknown $ids
+     */
+    public function getNamesByTids($ids) {
+        $names = [];
+        foreach ($ids as $Tid) {
+            $data = $this->find()
+                    ->where(['Tid' => $Tid])
+                    ->asArray()
+                    ->all();
+            $names[] = $data[0]['Tname'];
+        }
+        
+        return $names;
+    }
+    /**
+     * 通过老师的id得到信息
+     * @param unknown $Tid
+     */
+    public function getTeacherInfoByTid($Tid) {
+        $data = $this->find()
+        ->where(['Tid' => $Tid])
+        ->asArray()
+        ->all();
+        return $data[0];
     }
 }

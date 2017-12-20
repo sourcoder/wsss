@@ -67,7 +67,8 @@ class Summary extends \yii\db\ActiveRecord
 //         $this->book_id = $content['book_id'];
         $this->Zpathurl = $content['Zpathurl'];
         $this->Tid = $content['tid'];
-        $this->Ztime = date("Y-m-d", time());
+        date_default_timezone_set('PRC'); //设置中国时区
+        $this->Ztime = date("Y-m-d H:i:s", time());
         if($this->save())
         {
             return true;
@@ -83,7 +84,48 @@ class Summary extends \yii\db\ActiveRecord
         ->where(['Tid' => $Tid])
         ->orderBy(['Ztime' => SORT_DESC])
         ->asArray()
-    	->all();;
+    	->all();
         return $data;
+    }
+    
+    /**
+     * 得到所有老师的最新总结
+     * @param unknown $teachers
+     */
+    public function getAllLastestSummary($ids) {
+       
+        $data = [];
+        foreach ($ids as $Tid) {
+            $data[] = $this->find()
+                            ->where(['Tid' => $Tid])
+                            ->orderBy(['Ztime' => SORT_DESC])
+                            ->asArray()
+                            ->all()[0];
+        }
+        return $data;
+    }
+    /**
+     * 通过老师的id得到最新的summary
+     * @param unknown $Tid
+     */
+    public function getLastestSummaryByTid($Tid) {
+        $data = $this->find()
+        ->where(['Tid' => $Tid])
+        ->orderBy(['Ztime' => SORT_DESC])
+        ->asArray()
+        ->all();
+        return $data[0];
+    }
+    
+    /**
+     * 通过总结的id得到老师的id
+     * @param unknown $Zid
+     */
+    public function getTidByZid($Zid) {
+        $data = $this->find()
+        ->where(['Zid' => $Zid])
+        ->asArray()
+        ->all();
+        return $data[0]['Tid'];
     }
 }

@@ -35,7 +35,7 @@ use yii\widgets\ActiveForm;
 
     <?php // echo $form->field($model, 'Tdepartment') ?>
 
-    <?php // echo $form->field($model, 'Ttype') ?>
+    <?= //$form->field($model, 'Ttype') ?>
 
     <div class="form-group">
         <?= Html::submitButton('Search', ['class' => 'btn btn-primary']) ?>

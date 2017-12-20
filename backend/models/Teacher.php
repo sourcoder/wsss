@@ -45,6 +45,7 @@ class Teacher extends \yii\db\ActiveRecord
             [['Tgender'], 'string', 'max' => 4],
             [['Tphoto', 'Tdepartment'], 'string', 'max' => 100],
             [['Temail'], 'string', 'max' => 25],
+            [['Tphoto'], 'default', 'value' => 'img/avatar.png'],
         ];
     }
 
